@@ -3,6 +3,8 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 import json
+from sqlite_db import elis_openai_log_insert, sql_start
+from create_bot import bot, my_status
 
 file = open('/home/pavel/cfg/config.json', 'r')
 config = json.load(file)
@@ -30,7 +32,7 @@ def update(chat_id, group_messages, role, content, count_messages):
     else: 
         count_messages[chat_id] += 1
 
-    if(len(group_messages[chat_id])) > 15:
+    if(len(group_messages[chat_id])) > 11:
         group_messages[chat_id].pop(3)
     
     return group_messages
@@ -65,17 +67,29 @@ async def get_token_count(message):
         await bot.send_message(chat_id=message.chat.id, 
             text=f"Всего обработано сообщений в чате {i}: {str(count_messages[i])}\nContest Bufer Size: {str(len(group_messages[i]))}")
 
+def call_openai(chat_id) :
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages = group_messages[chat_id]
+        )
+    #global token_count
+    #global metadata
+    global prompt_tokens
+    prompt_tokens = prompt_tokens + int(response['usage']['prompt_tokens'])
+    global completion_tokens
+    completion_tokens = completion_tokens + int(response['usage']['completion_tokens'])
+    global total_tokens
+    total_tokens = total_tokens + int(response['usage']['total_tokens'])
 
-dp.register_message_handler(get_token_count, commands=['token_count'])
+    return response['choices'][0]['message']['content']
 
-@dp.message_handler()
 async def send(message : types.Message):
 
-    ff = open('workfile', 'a', encoding="utf-8")
-    ff.write(str(message.date) + ', ' + str(message.from_user.username) + ', ' + str(message.text) +
-'\n')
-    ff.close()
-
+    elis_openai_log_insert(my_status.dbase, message.date, str(message.from_user.id), str(message.from_user.username), 'chat_user', str(message.text))
+    #ff = open('workfile', 'a', encoding="utf-8")
+    #ff.write(str(message.date) + ', ' + str(message.from_user.username) + ', ' + str(message.text) + '\n')
+    #ff.close()
+    
     # Get the chat ID and user ID
     chat_id = str(message.chat.id)
     # user_id = str(message.from_user.id)
@@ -85,20 +99,7 @@ async def send(message : types.Message):
         if f'@{bot_info.username}' in message.text:
 
             update(chat_id, group_messages, "user", message.text, count_messages)
-            response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages = group_messages[chat_id]
-            )
-            #global token_count
-            #global metadata
-            global prompt_tokens
-            prompt_tokens = prompt_tokens + int(response['usage']['prompt_tokens'])
-            global completion_tokens
-            completion_tokens = completion_tokens + int(response['usage']['completion_tokens'])
-            global total_tokens
-            total_tokens = total_tokens + int(response['usage']['total_tokens'])
-
-            chat_response = response['choices'][0]['message']['content']
+            chat_response = call_openai(chat_id)
             update(chat_id, group_messages, "assistant", chat_response, count_messages)
             await message.answer(chat_response)
 
@@ -113,3 +114,6 @@ async def send(message : types.Message):
 
 if __name__ == '__main__':
     print('Hello!')
+    dbase = sqlite_db.sql_start(logger)
+    cur = dbase.cursor()
+

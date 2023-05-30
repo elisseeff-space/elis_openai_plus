@@ -1,4 +1,4 @@
-import audio_sqlite_db
+from sqlite_db import use_log_add_command
 #from elis_google_stt import transcribe_file
 from pathlib import Path
 from aiogram import Dispatcher, types
@@ -7,6 +7,7 @@ from create_bot import bot, my_status
 from client_kb import kb_client
 from recognize_yandex_stt import transcribe_file
 from datetime import datetime
+from elis_openai import send, get_token_count, update, call_openai, group_messages, count_messages
 
 #@dp.message_handler(commands=['start', 'help'])
 async def command_start(message : types.Message):
@@ -32,15 +33,25 @@ async def voice_message_handler(message: Message): # types.Message):
     file_name = path + f"/{voice.file_id}.ogg"
     start_time = datetime.now()
     str_buf = f"Recognition starts at: {start_time.strftime('%H:%M:%S')}."
-    await message.reply(str_buf)
+    await message.answer(str_buf)
     alternative = transcribe_file(file_name)
     end_time = datetime.now()
     runtime = end_time - start_time
-    str_buf = f"Recognition ready in: {runtime} seconds."
-    await message.reply(str_buf)
-    
-    await message.reply(alternative.text)
-    await audio_sqlite_db.use_log_add_command(message.from_user.username, message.from_user.id, alternative.text, len(alternative.words), my_status.get_language(), float(alternative.confidence))
+    str_buf = f"Recognition ready in: {runtime.seconds} seconds. Elis starts some corrections."
+    start_time = end_time
+    await message.answer(str_buf)
+
+    str_buf = 'исправь текст: ' + alternative.text
+    update(88888, group_messages, "user", str_buf, count_messages)
+    chat_response = call_openai(88888)
+    update(88888, group_messages, "assistant", chat_response, count_messages)
+    end_time = datetime.now()
+    runtime = end_time - start_time
+    str_buf = f"Elis ready in: {runtime.seconds} seconds."
+    await message.answer(str_buf)
+
+    use_log_add_command(my_status.dbase, message.from_user.username, message.from_user.id, alternative.text, len(alternative.words), my_status.get_language(), float(alternative.confidence))
+    await message.answer(chat_response)
 
 async def language_ru_command(message : types.Message):
     my_status.set_language('ru-RU')
@@ -68,6 +79,11 @@ async def language_auto_command(message : types.Message):
     await message.reply('автоматическое распознавание языка.')
 
 def register_handlers_client(dp : Dispatcher):
+
+    # OpenAI handlers
+    dp.register_message_handler(get_token_count, commands=['token_count'])
+
+    # Voice recognition handlers
     dp.register_message_handler(voice_message_handler, content_types=[
     types.ContentType.VOICE,
     types.ContentType.AUDIO,
@@ -79,6 +95,5 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(language_fr_command, commands=['fr'])
     dp.register_message_handler(language_auto_command, commands=['auto'])
     dp.register_message_handler(language_de_command, commands=['de'])
-    #dp.register_message_handler(language_ru_latest_long, commands=['ru_latest_long'])
-    #dp.register_message_handler(language_ru_latest_short, commands=['ru_latest_short'])
-    
+
+    dp.register_message_handler(send)

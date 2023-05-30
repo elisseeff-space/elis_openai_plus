@@ -5,10 +5,12 @@ __pycache__/
 
 # C extensions
 *.so
+*.db
 
 # Distribution / packaging
 .Python
 build/
+db/
 develop-eggs/
 dist/
 downloads/
@@ -21,6 +23,7 @@ parts/
 sdist/
 var/
 voice/
+voices/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
