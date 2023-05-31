@@ -3,7 +3,6 @@
 
 import grpc
 import yaml, json
-from create_bot import my_status
 
 import yandex.cloud.ai.stt.v2.stt_service_pb2 as stt_service_pb2
 import yandex.cloud.ai.stt.v2.stt_service_pb2_grpc as stt_service_pb2_grpc
@@ -13,7 +12,7 @@ CHUNK_SIZE = 3333
 def gen(folder_id, audio_file_name):
     # Specify recognition settings.
     specification = stt_service_pb2.RecognitionSpec(
-        language_code=my_status.get_language(),
+        language_code='auto',
         profanity_filter=True,
         model='general',
         partial_results=True,
@@ -36,7 +35,7 @@ def gen(folder_id, audio_file_name):
             data = f.read(CHUNK_SIZE)
 
 #def run(folder_id, iam_token, audio_file_name):
-def transcribe_file(audio_file_name) -> str:
+def transcribe_file(audio_file_name):
     # Establish a connection with the server.
     cred = grpc.ssl_channel_credentials()
     channel = grpc.secure_channel('stt.api.cloud.yandex.net:443', cred)

@@ -12,17 +12,18 @@ def sql_start(logger) -> sq.Connection:
     # log of voice recognition hystory
     dbase.execute('create table if not exists elis_openai_plus_use_log(use_date TEXT, user_name TEXT, user_id TEXT, action TEXT, words INT, language_code TEXT, confidence REAL)')
     # log of OpenAI chat hystory
-    dbase.execute('create table if not exists elis_openai_log(message_date TEXT, user_id TEXT, user_name TEXT, role TEXT, content TEXT)')
+    dbase.execute('create table if not exists elis_openai_log(message_date TEXT, user_id TEXT, user_name TEXT, role TEXT, content TEXT, prompt_tokens INTEGER, completion_tokens INTEGER, total_tokens INTEGER)')
     
     my_status.dbase = dbase
 
     dbase.commit()
     return dbase
 
-def elis_openai_log_insert(dbase, message_date, user_id: str, user_name: str, role: str, content: str) -> bool :
+def elis_openai_log_insert(dbase: sq.Connection, message_date, user_id: str, user_name: str, role: str,
+                content: str, prompt_tokens: int, completion_tokens: int, total_tokens: int) -> bool :
     #use_date = datetime.now()
-    params = (message_date, user_id, user_name, role, content)
-    dbase.execute('insert into elis_openai_log values (?,?,?,?,?)', params)
+    params = (message_date, user_id, user_name, role, content, prompt_tokens, completion_tokens, total_tokens)
+    dbase.execute('insert into elis_openai_log values (?,?,?,?,?,?,?,?)', params)
     dbase.commit()
     return True
 

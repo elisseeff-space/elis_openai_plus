@@ -29,10 +29,10 @@ class BotStatus:
     def get_qty_to_select(self) -> int:
         return int(self.rows_qty_to_select)
     
-my_status = BotStatus('auto', 0, 0)
+my_status = BotStatus('', 0, 0)
 
-#bot = Bot(token = config['rtlab_voice_bot_token'])
-bot = Bot(token = config['VoskModelSTT_bot'])
+bot = Bot(token = config['Elis_OpenAI_bot'])
+#bot = Bot(token = config['VoskModelSTT_bot'])
 
 #dp = Dispatcher(bot, storage=storage)
 dp = Dispatcher(bot)
