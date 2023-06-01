@@ -7,7 +7,7 @@ from create_bot import bot, my_status
 from client_kb import kb_client
 from recognize_yandex_stt import transcribe_file
 from datetime import datetime
-from elis_openai import send, get_token_count, update, call_openai, group_messages, count_messages
+from openai_req import send, get_token_count, update, call_openai
 from sqlite_db import elis_openai_log_insert
 
 #@dp.message_handler(commands=['start', 'help'])
@@ -15,10 +15,10 @@ async def command_start(message : types.Message):
 
     text_for_out = "Сейчас у Элис есть два режима работы:\n Первый - это обычный диалог с ChatGPT, когда вы говорите фразу голосом, а Элис отвечает на нее, как если бы вы передали ее текстом.\nВторой - это дуэт с системой распознавания, когда Элис только исправляет текст, введенный голосом, являясь как бы редактором-корректором. Есть три режима корректировки текста:\nПервый - исправление текста.\nВторой - это исправление текста в ласковом и нежном тоне, чтобы было приятно читать.\nТретий - это исправление текста по медицинской терминологии."
     try:
-        await bot.send_message(message.from_user.id, text_for_out, reply_markup=kb_client)
+        await bot.send_message(message.chat.id, text_for_out, reply_markup=kb_client)
         #await message.delete()
     except:
-        await message.reply('Something wrong with me... \nhttps://t.me/Elis_OpenAI_bot', reply_markup=kb_client)
+        await message.answer('Something wrong with me... \nhttps://t.me/Elis_OpenAI_bot', reply_markup=kb_client)
 
 async def handle_file(file: File, file_name: str, path: str):
     Path(f"{path}").mkdir(parents=True, exist_ok=True)
@@ -37,6 +37,7 @@ async def voice_message_handler(message: Message): # types.Message):
     start_time = datetime.now()
     str_buf = f"Recognition starts at: {start_time.strftime('%H:%M:%S')}."
     await message.answer(str_buf)
+    await bot.send_chat_action(message.chat.id, 'typing')
     alternative = transcribe_file(file_name)
     end_time = datetime.now()
     runtime = end_time - start_time
@@ -44,12 +45,15 @@ async def voice_message_handler(message: Message): # types.Message):
     start_time = end_time
     await message.answer(str_buf)
 
-    str_buf = str(my_status.get_language()) + str(alternative.text)
-    update(88888, group_messages, "user", str_buf, count_messages)
+    chat_id = str(message.chat.id)
+    #chat_id = message.chat.id
+    str_buf = str(my_status.get_open_ai_prefix(chat_id)) + str(alternative.text)
+    update(chat_id, my_status.group_messages, "user", str_buf, my_status.count_messages)
     elis_openai_log_insert(my_status.dbase, message.date, str(message.from_user.id), 
                         str(message.from_user.username), 'voice_user', str_buf, 0, 0, 0)
-    chat_response = call_openai(88888)
-    update(88888, group_messages, "assistant", chat_response['choices'][0]['message']['content'], count_messages)
+    await bot.send_chat_action(message.chat.id, 'typing')
+    chat_response = call_openai(chat_id)
+    update(chat_id, my_status.group_messages, "assistant", chat_response['choices'][0]['message']['content'], my_status.count_messages)
     elis_openai_log_insert(my_status.dbase, message.date, str(message.from_user.id), 
                         str(message.from_user.username), 'assistant', chat_response['choices'][0]['message']['content'], 
                         int(chat_response['usage']['prompt_tokens']), int(chat_response['usage']['completion_tokens']), int(chat_response['usage']['total_tokens']))
@@ -58,28 +62,28 @@ async def voice_message_handler(message: Message): # types.Message):
     str_buf = f"Elis ready in: {runtime.seconds} seconds."
     await message.answer(str_buf)
 
-    use_log_add_command(my_status.dbase, message.from_user.username, message.from_user.id, alternative.text, len(alternative.words), my_status.get_language(), float(alternative.confidence))
+    use_log_add_command(my_status.dbase, message.from_user.username, message.from_user.id, alternative.text, len(alternative.words), my_status.get_open_ai_prefix(chat_id), float(alternative.confidence))
     await message.answer(chat_response['choices'][0]['message']['content'])
 
 async def correction_command(message : types.Message):
-    my_status.set_language('Исправь текст:')
+    my_status.set_open_ai_prefix(str(message.chat.id),'Исправь текст:')
     #await bot.send_message(message.from_user.id, 'Russian Language of Voice Messages.')
-    await message.reply('Коррекция текста. Исправление ошибок распознавания')
+    await message.answer('Коррекция текста. Исправление ошибок распознавания')
 
 async def affect_command(message : types.Message):
-    my_status.set_language('Исправь текст в ласковом тоне:')
+    my_status.set_open_ai_prefix(str(message.chat.id),'Исправь текст в ласковом тоне:')
     #await bot.send_message(message.from_user.id, 'English Language of Voice Messages.')
-    await message.reply('Коррекция текста в ласковом тоне, чтобы было приятно читать.')
+    await message.answer('Коррекция текста в ласковом тоне, чтобы было приятно читать.')
 
 async def medical_command(message : types.Message):
-    my_status.set_language('Исправь текст строго в медицинской терминологии:')
+    my_status.set_open_ai_prefix(str(message.chat.id),'Исправь текст строго в медицинской терминологии:')
     #await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
-    await message.reply('Коррекция текста по медицинской терминологии.')
+    await message.answer('Коррекция текста по медицинской терминологии.')
 
 async def dialog_command(message : types.Message):
-    my_status.set_language('')
+    my_status.set_open_ai_prefix(str(message.chat.id),'')
     #await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
-    await message.reply('Прямой диалог c ChatGPT.')
+    await message.answer('Прямой диалог c ChatGPT.')
 
 def register_handlers_client(dp : Dispatcher):
 

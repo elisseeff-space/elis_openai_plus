@@ -34,21 +34,9 @@ async def cm_descstat(message : types.Message):
 
 async def cm_itemstat(message : types.Message):
     if message.from_user.id == idd:
-        df = sql_read()
-        #df.size
+        #df = sql_read()
         num_rows = df.shape[0]
-        if num_rows < my_status.get_qty_to_select(): num_rows_to_select = num_rows
-        else: num_rows_to_select = my_status.get_qty_to_select()
-        #bbuf = str(df[['use_date', 'user_name', 'action']].iloc[num_rows_to_select])
-        bbuf = df.iloc[0:num_rows_to_select, [0,1,3]]
-        #print(df.iloc[0:2, [0,1,3]])
-        #if my_status.get_offset() < num_rows :
-        #    bbuf = df.iloc[my_status.get_offset():num_rows_to_select, [0,1,3]]
-        #    my_status.add_rows_selected(num_rows_to_select)
-        #elif my_status.get_offset() + num_rows_to_select > num_rows :
-        #    my_status.clear_rows_selected()
-        #else :
-        #    my_status.add_rows_selected(num_rows_to_select)
+        bbuf = 'Collected: ' + str(num_rows) + ' rows.'
         await bot.send_message(message.from_user.id, bbuf, reply_markup=admin_kb.button_case_admin)
 # Handlers Registration
 def register_handlers_admin(dp : Dispatcher):

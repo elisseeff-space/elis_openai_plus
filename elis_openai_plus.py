@@ -1,8 +1,6 @@
-import json
+#import json
 import logging
-
 from aiogram.utils import executor
-
 import admin
 from sqlite_db import sql_start
 import client
@@ -22,13 +20,6 @@ logging.basicConfig(
     filename="/home/pavel/github/elis_openai_plus/log/elis_openai_plus_bot.log",
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
-
-
-file = open('/home/pavel/cfg/config.json', 'r')
-config = json.load(file)
-#rtlab_voice_bot_token
-
-#now = datetime.now()
 
 async def on_startup(_):
     logger.warning("Elisseeff Elis_OpenAI_plus Bot logging is ON!")

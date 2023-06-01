@@ -8,6 +8,7 @@ export PYTHONPATH="/home/pavel/github/Yandex_stt"
 export PYTHONPATH="/home/pavel/github/Yandex_stt/venv/lib/python3.10/site-packages"
 
 #pip install speechkit
+pip install openai
 pip install aiogram
 pip install pyyaml
 pip install pandas

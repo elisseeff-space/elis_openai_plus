@@ -1,10 +1,9 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton#, ReplyKeyboardRemove
 
-b1 = KeyboardButton('Share your PhoneNumber', request_contact=True)
-b2 = KeyboardButton('/correction')
-b3 = KeyboardButton('/affect')
-b4 = KeyboardButton('/medical')
-b5 = KeyboardButton('/dialog')
+b1 = KeyboardButton('/correction')
+b2 = KeyboardButton('/affect')
+b3 = KeyboardButton('/medical')
+b4 = KeyboardButton('/dialog')
 
 
 """
@@ -27,6 +26,6 @@ then we auto-select a model based on the parameters in the RecognitionConfig.
 kb_client = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 
 #kb_client.add(b1).add(b2).add(b3).row(b4, b5)
-kb_client.add(b5).row(b2, b3, b4).add(b1)
+kb_client.row(b4, b1).row(b2, b3)
 #kb_client.add(b1).add(b2).insert(b3)
 #kb_client.row(b1, b2, b3)

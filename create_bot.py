@@ -9,27 +9,25 @@ file = open('/home/pavel/cfg/config.json', 'r')
 config = json.load(file)
 
 class BotStatus:
-    rows_qty_to_select = 5
-    #rows_offset = 0
+    dbase: sq.Connection
+    # Initialize a dictionary to store messages for each group
+    # Здесь храним отдельные очереди сообщений для каждого группового чата,
+    # из которого приходят сообщения
+    group_messages = {}
+    count_messages = {}
+    open_ai_prefix = {}
+
+    def __init__(self, chat_id: str, prefix): 
+        # Request prefix for message to OpenAi API request
+        self.open_ai_prefix[chat_id] = prefix
+        
+    def set_open_ai_prefix(self, chat_id: str, prefix: str):
+        self.open_ai_prefix[chat_id] = prefix
+    def get_open_ai_prefix(self, chat_id) -> str:
+        return self.open_ai_prefix[chat_id]
     
-    def __init__(self, lang, rows_offset, dbase: sq.Connection):
-        self.lang = lang
-        self.rows_offset = rows_offset
-        self.dbase = dbase
-    def set_language(self, lang):
-        self.lang = lang
-    def get_language(self) -> str:
-        return self.lang
-    def add_rows_selected(self, rows_offset: int):
-        self.rows_offset += self.rows_offset
-    def clear_rows_selected(self):
-        self.rows_offset = 0
-    def get_offset(self) -> int:
-        return int(self.rows_offset)
-    def get_qty_to_select(self) -> int:
-        return int(self.rows_qty_to_select)
     
-my_status = BotStatus('', 0, 0)
+my_status = BotStatus('', 0)
 
 bot = Bot(token = config['Elis_OpenAI_bot'])
 #bot = Bot(token = config['VoskModelSTT_bot'])
