@@ -1,7 +1,7 @@
 import logging
 from aiogram.utils import executor
 from sqlite_db import sql_start
-from admin import register_handlers_admin, 
+from admin import register_handlers_admin
 from client import register_handlers_client
 from other import register_handlers_other
 from create_bot import dp, my_status

@@ -1,6 +1,6 @@
 from aiogram import Dispatcher, types
 from sqlite_db import sql_read, sql_read_tokens
-from admin_kb import button_case_admin, button_chats, button_tokens_used, button_voice
+from admin_kb import button_case_admin
 from create_bot import bot, my_status
 
 idd = None
@@ -10,11 +10,9 @@ idd = None
 async def moderator_command(message: types.Message):
     global idd
     idd = message.from_user.id
-    await bot.send_message(message.from_user.id, 'What do you want Sir Yandex?', reply_markup=button_case_admin)
+    await bot.send_message(message.from_user.id, 'What do you want Sir?', reply_markup=button_case_admin)
     await message.delete()
 
-
-# Start Menu Load Dialog
 # @dp.message_handler(commands='statistics', state=None)
 async def cm_tokens_used(message : types.Message):
     if message.from_user.id == idd:
