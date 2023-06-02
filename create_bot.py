@@ -1,5 +1,5 @@
 import json
-
+import logging
 from aiogram import Bot
 #from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import Dispatcher
@@ -16,6 +16,7 @@ class BotStatus:
     group_messages = {}
     count_messages = {}
     open_ai_prefix = {}
+    logger: logging.Logger
 
     def __init__(self, chat_id: str, prefix): 
         # Request prefix for message to OpenAi API request
@@ -29,8 +30,8 @@ class BotStatus:
     
 my_status = BotStatus('', 0)
 
-bot = Bot(token = config['Elis_OpenAI_bot'])
-#bot = Bot(token = config['VoskModelSTT_bot'])
+#bot = Bot(token = config['Elis_OpenAI_bot'])
+bot = Bot(token = config['VoskModelSTT_bot'])
 
 #dp = Dispatcher(bot, storage=storage)
 dp = Dispatcher(bot)

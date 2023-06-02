@@ -1,4 +1,5 @@
 from sqlite_db import use_log_add_command
+import logging
 #from elis_google_stt import transcribe_file
 from pathlib import Path
 from aiogram import Dispatcher, types
@@ -8,12 +9,12 @@ from client_kb import kb_client
 from recognize_yandex_stt import transcribe_file
 from datetime import datetime
 from openai_req import send, get_token_count, update, call_openai
-from sqlite_db import elis_openai_log_insert
+from sqlite_db import elis_openai_log_insert, get_help_text
 
 #@dp.message_handler(commands=['start', 'help'])
 async def command_start(message : types.Message):
 
-    text_for_out = "Сейчас у Элис есть два режима работы:\n Первый - это обычный диалог с ChatGPT, когда вы говорите фразу голосом, а Элис отвечает на нее, как если бы вы передали ее текстом.\nВторой - это дуэт с системой распознавания, когда Элис только исправляет текст, введенный голосом, являясь как бы редактором-корректором. Есть три режима корректировки текста:\nПервый - исправление текста.\nВторой - это исправление текста в ласковом и нежном тоне, чтобы было приятно читать.\nТретий - это исправление текста по медицинской терминологии."
+    text_for_out = get_help_text(my_status.dbase, my_status.logger)
     try:
         await bot.send_message(message.chat.id, text_for_out, reply_markup=kb_client)
         #await message.delete()

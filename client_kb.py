@@ -26,6 +26,6 @@ then we auto-select a model based on the parameters in the RecognitionConfig.
 kb_client = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 
 #kb_client.add(b1).add(b2).add(b3).row(b4, b5)
-kb_client.row(b4, b1).row(b2, b3)
+kb_client.add(b4).row(b1, b2, b3)
 #kb_client.add(b1).add(b2).insert(b3)
 #kb_client.row(b1, b2, b3)

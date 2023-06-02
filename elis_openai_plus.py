@@ -5,7 +5,7 @@ import admin
 from sqlite_db import sql_start
 import client
 import other
-from create_bot import dp
+from create_bot import dp, my_status
 
 #from datetime import datetime
 
@@ -13,7 +13,7 @@ client.register_handlers_client(dp)
 admin.register_handlers_admin(dp)
 other.register_handlers_other(dp)
 
-logger = logging.getLogger(__name__)
+my_status.logger = logging.getLogger(__name__)
 #formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 logging.basicConfig(
     level=logging.INFO,
@@ -22,11 +22,11 @@ logging.basicConfig(
 )
 
 async def on_startup(_):
-    logger.warning("Elisseeff Elis_OpenAI_plus Bot logging is ON!")
+    my_status.logger.warning("Elisseeff Elis_OpenAI_plus Bot logging is ON!")
     
 # Start the bot
 if __name__ == '__main__':
-    sql_start(logger)
+    sql_start()
     try:
         executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
     except (KeyboardInterrupt, SystemExit):
