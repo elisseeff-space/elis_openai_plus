@@ -1,17 +1,16 @@
-#import json
 import logging
 from aiogram.utils import executor
-import admin
 from sqlite_db import sql_start
-import client
-import other
+from admin import register_handlers_admin, 
+from client import register_handlers_client
+from other import register_handlers_other
 from create_bot import dp, my_status
 
 #from datetime import datetime
 
-client.register_handlers_client(dp)
-admin.register_handlers_admin(dp)
-other.register_handlers_other(dp)
+register_handlers_client(dp)
+register_handlers_admin(dp)
+register_handlers_other(dp)
 
 my_status.logger = logging.getLogger(__name__)
 #formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
