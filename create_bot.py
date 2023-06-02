@@ -30,8 +30,8 @@ class BotStatus:
     
 my_status = BotStatus('', 0)
 
-#bot = Bot(token = config['Elis_OpenAI_bot'])
-bot = Bot(token = config['VoskModelSTT_bot'])
+bot = Bot(token = config['Elis_OpenAI_bot'])
+#bot = Bot(token = config['VoskModelSTT_bot'])
 
 #dp = Dispatcher(bot, storage=storage)
 dp = Dispatcher(bot)
