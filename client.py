@@ -52,7 +52,7 @@ async def voice_message_handler(message: Message): # types.Message):
     str_buf = str(my_status.get_open_ai_prefix(chat_id)) + str(alternative.text)
     update(chat_id, my_status.group_messages, "user", str_buf, my_status.count_messages)
     elis_openai_log_insert(message.date, str(message.from_user.id), 
-                        str(message.from_user.username), chat_id, 'voice_user', str_buf, 0, 0, 0)
+                        str(message.from_user.username), chat_id, 'user', str_buf, 0, 0, 0)
     await bot.send_chat_action(message.chat.id, 'typing')
     chat_response = call_openai(chat_id)
     update(chat_id, my_status.group_messages, "assistant", chat_response['choices'][0]['message']['content'], my_status.count_messages)

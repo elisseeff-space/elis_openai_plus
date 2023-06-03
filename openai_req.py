@@ -65,7 +65,7 @@ async def send(message : types.Message):
             await bot.send_chat_action(message.chat.id, 'typing')
             update(chat_id, my_status.group_messages, "user", message.text, my_status.count_messages)
             elis_openai_log_insert(message.date, str(message.from_user.id), 
-                        str(message.from_user.username), chat_id, 'chat_user', str(message.text), 0, 0, 0)
+                        str(message.from_user.username), chat_id, 'user', str(message.text), 0, 0, 0)
             try: chat_response = call_openai(chat_id)
             except openai.error.APIError as e:
                 if e.status_code == 429:
