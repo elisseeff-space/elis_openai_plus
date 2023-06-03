@@ -8,9 +8,10 @@ from create_bot import dp, my_status
 
 #from datetime import datetime
 
-register_handlers_client(dp)
 register_handlers_admin(dp)
-register_handlers_other(dp)
+#register_handlers_other(dp)
+register_handlers_client(dp)
+
 
 my_status.logger = logging.getLogger(__name__)
 #formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')

@@ -1,6 +1,5 @@
 from sqlite_db import use_log_add_command
 import logging
-#from elis_google_stt import transcribe_file
 from pathlib import Path
 from aiogram import Dispatcher, types
 from aiogram.types import ContentType, File, Message, ReplyKeyboardRemove
@@ -8,13 +7,13 @@ from create_bot import bot, my_status
 from client_kb import kb_client
 from recognize_yandex_stt import transcribe_file
 from datetime import datetime
-from openai_req import send, get_token_count, update, call_openai
+from openai_req import send, update, call_openai
 from sqlite_db import elis_openai_log_insert, get_help_text
 
 #@dp.message_handler(commands=['start', 'help'])
 async def command_start(message : types.Message):
 
-    text_for_out = get_help_text(my_status.dbase, my_status.logger)
+    text_for_out = get_help_text()
     try:
         await bot.send_message(message.chat.id, text_for_out, reply_markup=kb_client)
         #await message.delete()
@@ -28,6 +27,8 @@ async def handle_file(file: File, file_name: str, path: str):
 
 # @dp.message_handler(content_types=[ContentType.VOICE])
 async def voice_message_handler(message: Message): # types.Message):
+    # Set prefix for send correct query to OpenAI
+    my_status.set_open_ai_prefix(str(message.chat.id),'~~~')
     # Get the file ID of the voice message
     voice = await message.voice.get_file()
     path = "/home/pavel/github/elis_openai_plus/voices"
@@ -50,20 +51,20 @@ async def voice_message_handler(message: Message): # types.Message):
     #chat_id = message.chat.id
     str_buf = str(my_status.get_open_ai_prefix(chat_id)) + str(alternative.text)
     update(chat_id, my_status.group_messages, "user", str_buf, my_status.count_messages)
-    elis_openai_log_insert(my_status.dbase, message.date, str(message.from_user.id), 
-                        str(message.from_user.username), 'voice_user', str_buf, 0, 0, 0)
+    elis_openai_log_insert(message.date, str(message.from_user.id), 
+                        str(message.from_user.username), chat_id, 'voice_user', str_buf, 0, 0, 0)
     await bot.send_chat_action(message.chat.id, 'typing')
     chat_response = call_openai(chat_id)
     update(chat_id, my_status.group_messages, "assistant", chat_response['choices'][0]['message']['content'], my_status.count_messages)
-    elis_openai_log_insert(my_status.dbase, message.date, str(message.from_user.id), 
-                        str(message.from_user.username), 'assistant', chat_response['choices'][0]['message']['content'], 
+    elis_openai_log_insert(message.date, str(message.from_user.id), 
+                        str(message.from_user.username), chat_id, 'assistant', chat_response['choices'][0]['message']['content'], 
                         int(chat_response['usage']['prompt_tokens']), int(chat_response['usage']['completion_tokens']), int(chat_response['usage']['total_tokens']))
     end_time = datetime.now()
     runtime = end_time - start_time
     str_buf = f"Elis ready in: {runtime.seconds} seconds."
     await message.answer(str_buf)
 
-    use_log_add_command(my_status.dbase, message.from_user.username, message.from_user.id, alternative.text, len(alternative.words), my_status.get_open_ai_prefix(chat_id), float(alternative.confidence))
+    use_log_add_command(message.from_user.username, message.from_user.id, alternative.text, len(alternative.words), my_status.get_open_ai_prefix(chat_id), float(alternative.confidence))
     await message.answer(chat_response['choices'][0]['message']['content'])
 
 async def correction_command(message : types.Message):
@@ -88,9 +89,6 @@ async def dialog_command(message : types.Message):
 
 def register_handlers_client(dp : Dispatcher):
 
-    # OpenAI handlers
-    dp.register_message_handler(get_token_count, commands=['token_count'])
-
     # Voice recognition handlers
     dp.register_message_handler(voice_message_handler, content_types=[
     types.ContentType.VOICE,
@@ -105,3 +103,4 @@ def register_handlers_client(dp : Dispatcher):
     #dp.register_message_handler(language_auto_command, commands=['auto'])
 
     dp.register_message_handler(send)
+    dp.register_edited_message_handler(send)

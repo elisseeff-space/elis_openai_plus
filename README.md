@@ -17,9 +17,14 @@ pip install pydub
 pip install yandex-speechkit
 
 
-
+help - Help Instruction.
+dialog - Прямой диалог c ChatGPT.
+correction - Коррекция текста. Исправление ошибок распознавания.
+affect - Коррекция текста в ласковом тоне, чтобы было приятно читать.
+medical - Коррекция текста по медицинской терминологии.
 
 export IAM_TOKEN=`yc iam create-token`
 curl -H "Authorization: Bearer ${IAM_TOKEN}"   https://resource-manager.api.cloud.yandex.net/resource-manager/v1/clouds
 
 export FOLDER_ID="b1g3ku6t41pjb00bids8"
+

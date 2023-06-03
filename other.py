@@ -15,8 +15,8 @@ async def echo_send(message : types.Message):
         .intersection(set(i['word'] for i in data)) != set():
         await message.reply('Маты запрещены!')
         await message.delete()
-    else:
-        await message.reply('I`m here.')
+    #else:
+    #    await message.reply('I`m here.')
 
 def register_handlers_other(dp : Dispatcher):
     dp.register_message_handler(echo_send)

@@ -23,7 +23,10 @@ class BotStatus:
         self.open_ai_prefix[chat_id] = prefix
         
     def set_open_ai_prefix(self, chat_id: str, prefix: str):
-        self.open_ai_prefix[chat_id] = prefix
+        if prefix == '~~~':
+            if chat_id not in self.open_ai_prefix.keys():
+                self.open_ai_prefix[chat_id] = ''
+        else: self.open_ai_prefix[chat_id] = prefix
     def get_open_ai_prefix(self, chat_id) -> str:
         return self.open_ai_prefix[chat_id]
     
