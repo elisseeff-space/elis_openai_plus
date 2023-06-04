@@ -45,6 +45,8 @@ async def cm_chats(message : types.Message):
             print(f"cm_chats: chat: {i}. type: {chat['type']}. title: {chat['title']}")
             if chat['type'] == 'group':
                 bbuf += chat['title'] + ': ' + str(my_status.count_messages[i]) + ';\n'
+            elif chat['type'] == 'supergroup':
+                bbuf += chat['title'] + ': ' + str(my_status.count_messages[i]) + ';\n'
             elif chat['type'] == 'private':
                 bbuf += chat['username'] + ': ' + str(my_status.count_messages[i]) + ';\n'
             else:
