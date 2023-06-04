@@ -1,7 +1,7 @@
 from aiogram import Dispatcher, types
 from sqlite_db import sql_read, sql_read_tokens, get_voice_messages_stat, get_elis_stat
 from admin_kb import button_case_admin
-from create_bot import bot
+from create_bot import bot, my_status
 
 idd = None
 
@@ -38,7 +38,16 @@ async def cm_chats(message : types.Message):
     global idd
     if message.from_user.id == idd:
         bbuf = 'Chats in connection: ' + str(len(my_status.group_messages)) + '.\n'
-        bbuf += 'Messages in chats'
+        bbuf += 'Messages in chats\n'
+        for i in my_status.count_messages.keys():
+            #chat_id = message.chat.id
+            chat = await bot.get_chat(int(i))
+            if chat['type'] == 'group':
+                bbuf += chat['title'] + ': ' + str(my_status.count_messages[i]) + ';\n'
+            elif chat['type'] == 'private':
+                bbuf += chat['username'] + ': ' + str(my_status.count_messages[i]) + ';\n'
+            else:
+                bbuf += 'not found...'
         await bot.send_message(message.from_user.id, bbuf, reply_markup=button_case_admin)
 
 async def cm_voice_records(message : types.Message):

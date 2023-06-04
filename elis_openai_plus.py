@@ -31,8 +31,7 @@ async def on_startup(_):
             res1 = get_chat_messages(i[0])
             for j in res1:
                 update(i[0], my_status.group_messages, j[0], j[1], my_status.count_messages)
-                print('chat id : ', j)
-    
+                    
 # Start the bot
 if __name__ == '__main__':
     

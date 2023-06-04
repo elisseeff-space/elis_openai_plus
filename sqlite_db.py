@@ -51,7 +51,7 @@ def get_elis_chats_for_initialisation():
 def get_chat_messages(chat_id):
     #global my_status
     cur = my_status.dbase.cursor()
-    select_query = "SELECT role, content from elis_openai_log where chat_id = " + chat_id + " order by message_date LIMIT 3"
+    select_query = "SELECT role, content from elis_openai_log where chat_id = " + chat_id + " order by message_date LIMIT 5"
     cur.execute(select_query)
     res = cur.fetchall()
     if res is not None:
