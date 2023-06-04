@@ -40,8 +40,9 @@ async def cm_chats(message : types.Message):
         bbuf = 'Chats in connection: ' + str(len(my_status.group_messages)) + '.\n'
         bbuf += 'Messages in chats\n'
         for i in my_status.count_messages.keys():
-            #chat_id = message.chat.id
             chat = await bot.get_chat(int(i))
+            my_status.logger.warning(f"cm_chats: chat: {i}. type: {chat['type']}. title: {chat['title']}")
+            print(f"cm_chats: chat: {i}. type: {chat['type']}. title: {chat['title']}")
             if chat['type'] == 'group':
                 bbuf += chat['title'] + ': ' + str(my_status.count_messages[i]) + ';\n'
             elif chat['type'] == 'private':
